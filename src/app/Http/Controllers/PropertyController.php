@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 
 class PropertyController extends Controller
 {
+    use ValidatesRequests;
+
     /**
      * List and filter real estate properties.
      *
@@ -17,7 +21,16 @@ class PropertyController extends Controller
     {
         $validated = $request->validate([
             'price_min' => 'nullable|numeric|min:0',
-            'price_max' => 'nullable|numeric|gt:price_min',
+            'price_max' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->has('price_min') && $value <= $request->price_min) {
+                        $fail('The price max must be greater than the minimum price.');
+                    }
+                },
+            ],
             'per_page' => 'nullable|integer|min:1|max:100',
             'page' => 'nullable|integer|min:1',
         ]);
