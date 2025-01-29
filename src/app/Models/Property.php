@@ -9,4 +9,10 @@ class Property extends Model
 {
     /** @use HasFactory<\Database\Factories\PropertyFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'address',
+        'price'
+    ];
 }
