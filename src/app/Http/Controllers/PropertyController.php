@@ -3,33 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class PropertyController extends Controller
 {
     /**
-     * Display a listing of the property.
+     * List and filter real estate properties.
+     *
+     * Returns a paginated list of properties with optional price range filtering.
      */
     public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'price_min' => 'nullable|numeric|min:0',
+            'price_max' => 'nullable|numeric|gt:price_min',
+            'per_page' => 'nullable|integer|min:1|max:100',
+            'page' => 'nullable|integer|min:1',
+            'offset' => 'nullable|integer|min:0',
+        ]);
+
         $query = Property::query();
 
         if ($request->has('price_min')) {
-            $query->where('price', '>=', $request->price_min);
+            $query->where('price', '>=', $validated['price_min']);
         }
 
         if ($request->has('price_max')) {
-            $query->where('price', '<=', $request->price_max);
+            $query->where('price', '<=', $validated['price_max']);
         }
 
-        $properties = $query->get();
+        if ($request->has('offset')) {
+            $query->offset($validated['offset']);
+        }
+
+        $perPage = $request->input('per_page', 15);
+        $properties = $query->paginate($perPage);
 
         return response()->json($properties);
     }
 
     /**
-     * Store a newly created property.
+     * Create a new property listing.
+     *
+     * Store a new real estate property with the required name, address, and price.
      */
     public function store(Request $request): JsonResponse
     {
@@ -45,17 +62,18 @@ class PropertyController extends Controller
     }
 
     /**
-     * Display the specified property
+     * Get a specific property by ID.
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
         $property = Property::findOrFail($id);
-
         return response()->json($property);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update a property listing.
+     *
+     * Partially update a property's information. Only provided fields will be updated.
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -73,7 +91,7 @@ class PropertyController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete a property listing.
      */
     public function destroy(string $id): JsonResponse
     {
