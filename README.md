@@ -3,33 +3,24 @@
 
 A RESTful API for managing real estate properties, built with Laravel.
 
-## Features
-
--   CRUD operations for property listings
--   Price range filtering
--   Pagination support
--   API documentation with Scramble
--   SQLite database for simplicity
--   Full test coverage
-
-## Setup
+## Run locally
 
 1.  Clone the repository
 2.  Build and start Docker containers:
 
-bash
+bash ```
 
 Copy
 
 `docker compose build docker compose up`
-
-3.  Generate application key and setup database:
+```
+3.  Setup the application:
 
 bash
 
 Copy
 
-`docker compose run --rm api php artisan key:generate docker compose run --rm api php artisan migrate`
+`docker compose run --rm api php artisan key:generate docker compose run --rm api php artisan migrate docker compose run --rm api php artisan db:seed # populate with sample data`
 
 ## API Endpoints
 
@@ -53,14 +44,19 @@ Copy
 
 ### Documentation
 
--   `GET /docs/api` - Interactive API documentation
+-   `GET /docs/api` - Interactive API documentation (open in browser)
 
 ## Testing
 
 Run tests with:
 
-bash
+bash ```
 
 Copy
 
 `docker compose run --rm api php artisan test`
+```
+## Notes
+
+-   Uses SQLite for database
+-   Sample data available via seeder

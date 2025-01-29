@@ -20,7 +20,6 @@ class PropertyController extends Controller
             'price_max' => 'nullable|numeric|gt:price_min',
             'per_page' => 'nullable|integer|min:1|max:100',
             'page' => 'nullable|integer|min:1',
-            'offset' => 'nullable|integer|min:0',
         ]);
 
         $query = Property::query();
@@ -31,10 +30,6 @@ class PropertyController extends Controller
 
         if ($request->has('price_max')) {
             $query->where('price', '<=', $validated['price_max']);
-        }
-
-        if ($request->has('offset')) {
-            $query->offset($validated['offset']);
         }
 
         $perPage = $request->input('per_page', 15);
